@@ -36,9 +36,10 @@ t1 = en1 - st1
 t2 = en2 - st2
 
 
-assert len(vocab) == len(
-    vocab_custom
-), f"different len in vocabulary, {len(vocab)} sklearn vs {len(vocab_custom)} custom"
+assert len(vocab) == len(vocab_custom), (
+    f"different len in vocabulary:"
+    f" {len(vocab)} sklearn vs {len(vocab_custom)} custom"
+)
 
 assert not (
     set(vocab) ^ set(vocab_custom)
@@ -47,6 +48,12 @@ assert not (
 X_np = X.toarray()
 vocab_custom_dict = dict(zip(vocab_custom, range(len(vocab_custom))))
 X_custom_np = np.array(X_custom)[:, [vocab_custom_dict[word] for word in vocab]]
+
+assert X_np.shape == X_custom_np.shape, (
+    f"doc-term matrices shapes are not equal: "
+    f"{X_np.shape} sklearn vs {X_custom_np.shape} custom"
+)
+
 assert (
     np.sum(X_np != X_custom_np) == 0
 ), "doc-term matrices are not equal, sorry, you're on your own"
