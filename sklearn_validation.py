@@ -1,5 +1,5 @@
 """Measure speed comparison with CountVectorizer form sklearn
-Corpus - Frankestein (441k characters, 7.6k lines, 3.1k sentences"""
+Corpus - Frankenstein (441k characters, 7.6k lines, 3.1k sentences)"""
 from sklearn.feature_extraction.text import CountVectorizer
 from main import CountVectorizer as CustomCountVectorizer
 import numpy as np
@@ -20,34 +20,33 @@ vectorizer = CountVectorizer()
 
 st1 = time.perf_counter()
 X = vectorizer.fit_transform(corpus)
-vocab = vectorizer.get_feature_names_out()
+vocab_sklearn = vectorizer.get_feature_names_out()
 en1 = time.perf_counter()
 
-vocab = list(vocab)
+features = list(vocab_sklearn)
 
 vectorizer_custom = CustomCountVectorizer()
 
 st2 = time.perf_counter()
 X_custom = vectorizer_custom.fit_transform(corpus)
-vocab_custom = vectorizer_custom.get_feature_names_out()
+features_custom = vectorizer_custom.get_feature_names_out()
 en2 = time.perf_counter()
 
 t1 = en1 - st1
 t2 = en2 - st2
 
 
-assert len(vocab) == len(vocab_custom), (
+assert len(features) == len(features_custom), (
     f"different len in vocabulary:"
-    f" {len(vocab)} sklearn vs {len(vocab_custom)} custom"
+    f" {len(features)} sklearn vs {len(features_custom)} custom"
 )
 
-assert not (
-    set(vocab) ^ set(vocab_custom)
-), f"some extra words: {set(vocab) ^ set(vocab_custom)}"
+xor_words = set(features) ^ set(features_custom)
+assert not xor_words, f"some extra words: {xor_words}"
 
 X_np = X.toarray()
-vocab_custom_dict = dict(zip(vocab_custom, range(len(vocab_custom))))
-X_custom_np = np.array(X_custom)[:, [vocab_custom_dict[word] for word in vocab]]
+vocab_custom_dict = dict(zip(features_custom, range(len(features_custom))))
+X_custom_np = np.array(X_custom)[:, [vocab_custom_dict[word] for word in features]]
 
 assert X_np.shape == X_custom_np.shape, (
     f"doc-term matrices shapes are not equal: "
@@ -67,13 +66,13 @@ def get_git_revision_short_hash() -> str:
     )
 
 
-with open("stats.csv", "r") as f:
-    last_line = f.read().strip().split("\n")[-1]
+with open("stats.csv", "r") as fr:
+    last_line = fr.read().strip().split("\n")[-1]
     last_git_hash_stats = last_line.split(";")[0]
     cur_git_hash = get_git_revision_short_hash()
 
     if last_git_hash_stats != cur_git_hash:
-        with open("stats.csv", "a") as f:
+        with open("stats.csv", "a") as fa:
             values = [
                 cur_git_hash,
                 round(t1, 4),
@@ -81,4 +80,4 @@ with open("stats.csv", "r") as f:
                 round(t2 / t1, 2),
             ]
             values_str = map(str, values)
-            print(";".join(values_str), file=f)
+            print(";".join(values_str), file=fa)
