@@ -39,8 +39,8 @@ class CountVectorizer:
         Also we can replace vocab_size with len(word2dict), but this might
         be less clear than now
         """
-        doc_term_matrix = []
-        word2idx: Vocab = dict()
+        doc_term_matrix: DocTermMatrix = []
+        word2idx: Vocab = {}
         vocab_size = 0
         for sentence in corpus:
             doc_term_vec = [0] * len(word2idx)
@@ -80,7 +80,7 @@ class CountVectorizer:
 
         return doc_term_matrix
 
-    def get_feature_names(self) -> list[str]:
+    def get_feature_names(self) -> list[Word]:
         """Get feature names from built vocabulary, ordered"""
         if not self.vocab:
             raise RuntimeError("Run fit_transform first")
@@ -90,7 +90,7 @@ class CountVectorizer:
         """For compatibility with sklearn"""
         return self
 
-    def get_feature_names_out(self) -> list[str]:
+    def get_feature_names_out(self) -> list[Word]:
         """For compatibility with sklearn"""
         return self.get_feature_names()
 
