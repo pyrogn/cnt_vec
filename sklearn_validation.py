@@ -1,10 +1,16 @@
 """Measure speed comparison with CountVectorizer form sklearn
-Corpus - Frankenstein (441k characters, 7.6k lines, 3.1k sentences)"""
-from sklearn.feature_extraction.text import CountVectorizer
-from main import CountVectorizer as CustomCountVectorizer
-import numpy as np
-import time
+
+Corpus - Frankenstein (441k characters, 7.6k lines, 3.1k sentences)
+
+This looks quite a mess, but I think it's ok for now
+"""
 import subprocess
+import time
+
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+
+from main import CountVectorizer as CustomCountVectorizer
 
 _simple_corpus = [
     "This is the first document.",

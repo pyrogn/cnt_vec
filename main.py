@@ -40,7 +40,7 @@ class CountVectorizer:
         be less clear than now
         """
         doc_term_matrix = []
-        word2idx = dict()
+        word2idx: Vocab = dict()
         vocab_size = 0
         for sentence in corpus:
             doc_term_vec = [0] * len(word2idx)
@@ -90,7 +90,7 @@ class CountVectorizer:
         """For compatibility with sklearn"""
         return self
 
-    def get_feature_names_out(self):
+    def get_feature_names_out(self) -> list[str]:
         """For compatibility with sklearn"""
         return self.get_feature_names()
 
