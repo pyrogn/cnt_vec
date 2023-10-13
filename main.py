@@ -14,19 +14,16 @@ class CountVectorizer:
     @staticmethod
     def _word_cnt(corpus):
         word_cnt_corpus = []
-        # vocab = set()
-        vocab = []
+        vocab = set()
         for sentence in corpus:
             word_cnt_dict = defaultdict(int)
             for word in re.findall(r"\w+", sentence.lower()):
                 if len(word) < 2:
                     continue
                 word_cnt_dict[word] += 1
-                if word not in vocab:
-                    vocab.append(word)
             word_cnt_corpus.append(dict(word_cnt_dict))
 
-            # vocab.update(set(word_cnt_dict.keys()))
+            vocab.update(set(word_cnt_dict.keys()))
 
         vocab = dict(zip(vocab, range(len(vocab))))
 
