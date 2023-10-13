@@ -3,6 +3,6 @@ repos:
     hooks:
     -   id: speed_comparison
         name: speed comparison
-        entry: python -O -m sklearn_validation
+        entry: python -m sklearn_validation
         language: system
         types: [python]
