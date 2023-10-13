@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 
 
@@ -17,10 +18,12 @@ class CountVectorizer:
         vocab = []
         for sentence in corpus:
             word_cnt_dict = defaultdict(int)
-            for word in sentence.split():
-                word_cnt_dict[word.lower()] += 1
-                if word.lower() not in vocab:
-                    vocab.append(word.lower())
+            for word in re.findall(r"\w+", sentence.lower()):
+                if len(word) < 2:
+                    continue
+                word_cnt_dict[word] += 1
+                if word not in vocab:
+                    vocab.append(word)
             word_cnt_corpus.append(dict(word_cnt_dict))
 
             # vocab.update(set(word_cnt_dict.keys()))
@@ -37,8 +40,14 @@ class CountVectorizer:
 
         return id_cnt, vocab
 
+    def toarray(self):
+        return self
+
+    def get_feature_names_out(self):
+        return self.get_feature_names()
+
     def get_feature_names(self):
-        return self.vocab
+        # return self.vocab
         return list(self.vocab)
 
 
