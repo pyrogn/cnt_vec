@@ -69,10 +69,10 @@ class CountVectorizer:
         vocab_size: int,
     ) -> DocTermMatrix:
         """Right pad vectors in matrix with zero up to vocab_size"""
-        for sentence in doc_term_matrix:
-            if len(sentence) == vocab_size:
+        for vec in doc_term_matrix:
+            if len(vec) == vocab_size:
                 break
-            sentence.extend([0] * (vocab_size - len(sentence)))
+            vec.extend([0] * (vocab_size - len(vec)))
 
         assert set(map(len, doc_term_matrix)) == {
             vocab_size
