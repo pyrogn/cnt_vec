@@ -4,11 +4,12 @@ Corpus - Frankenstein (441k characters, 7.6k lines, 3.1k sentences)
 
 This looks quite a mess, but I think it's ok for now
 """
+import functools
 import subprocess
 import time
 
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer  # type: ignore
 
 from main import CountVectorizer as CustomCountVectorizer
 
@@ -22,24 +23,43 @@ _simple_corpus = [
 with open("data/frankenstein.txt", "r") as f:
     corpus = f.read().split(".")
 
+
+def log_time(fn):
+    @functools.wraps(fn)
+    def _wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = fn(*args, **kwargs)
+        end_time = time.perf_counter()
+        time_total = end_time - start_time
+        return result, time_total
+
+    return _wrapper
+
+
+@log_time
+def vectorizer_run_log(vectorizer, corpus):
+    X = vectorizer.fit_transform(corpus)
+    features = vectorizer.get_feature_names_out()
+    return X, features
+
+
+def unify_X_features(X, features, *, is_sklearn: bool):
+    if is_sklearn:
+        X = X.toarray()
+        features = list(features)
+    X = np.array(X)
+    return X, features
+
+
 vectorizer = CountVectorizer()
-
-st1 = time.perf_counter()
-X = vectorizer.fit_transform(corpus)
-vocab_sklearn = vectorizer.get_feature_names_out()
-en1 = time.perf_counter()
-
-features = list(vocab_sklearn)
+(X, features), t1 = vectorizer_run_log(vectorizer, corpus)
+X, features = unify_X_features(X, features, is_sklearn=True)
 
 vectorizer_custom = CustomCountVectorizer()
-
-st2 = time.perf_counter()
-X_custom = vectorizer_custom.fit_transform(corpus)
-features_custom = vectorizer_custom.get_feature_names_out()
-en2 = time.perf_counter()
-
-t1 = en1 - st1
-t2 = en2 - st2
+(X_custom, features_custom), t2 = vectorizer_run_log(vectorizer_custom, corpus)
+X_custom, features_custom = unify_X_features(
+    X_custom, features_custom, is_sklearn=False
+)
 
 
 assert len(features) == len(features_custom), (
@@ -50,17 +70,16 @@ assert len(features) == len(features_custom), (
 xor_words = set(features) ^ set(features_custom)
 assert not xor_words, f"some extra words: {xor_words}"
 
-X_np = X.toarray()
 vocab_custom_dict = dict(zip(features_custom, range(len(features_custom))))
-X_custom_np = np.array(X_custom)[:, [vocab_custom_dict[word] for word in features]]
+X_custom_same_order = X_custom[:, [vocab_custom_dict[word] for word in features]]
 
-assert X_np.shape == X_custom_np.shape, (
+assert X.shape == X_custom_same_order.shape, (
     f"doc-term matrices shapes are not equal: "
-    f"{X_np.shape} sklearn vs {X_custom_np.shape} custom"
+    f"{X.shape} sklearn vs {X_custom_same_order.shape} custom"
 )
 
 assert (
-    np.sum(X_np != X_custom_np) == 0
+    np.sum(X != X_custom_same_order) == 0
 ), "doc-term matrices are not equal, sorry, you're on your own"
 
 

@@ -43,11 +43,11 @@ class CountVectorizer:
         word2idx: Vocab = {}
         vocab_size = 0
         for sentence in corpus:
-            doc_term_vec = [0] * len(word2idx)
+            doc_term_vec = [0] * vocab_size
             for word in re.findall(r"\w{2,}", sentence.lower()):
                 try:
                     doc_term_vec[word2idx[word]] += 1
-                except KeyError:
+                except KeyError:  # new word in vocab
                     doc_term_vec.append(1)
                     word2idx[word] = vocab_size  # always incremental value
                     vocab_size += 1
@@ -56,7 +56,6 @@ class CountVectorizer:
                     f"desync between {len(doc_term_vec)=}, "
                     f"{len(word2idx)=} and {vocab_size=}"
                 )
-
             doc_term_matrix.append(doc_term_vec)
 
         padded_doc_term_matrix = self._pad_doc_term_matrix(doc_term_matrix, vocab_size)
@@ -85,10 +84,6 @@ class CountVectorizer:
         if not self.vocab:
             raise RuntimeError("Run fit_transform first")
         return list(self.vocab)
-
-    def toarray(self):
-        """For compatibility with sklearn"""
-        return self
 
     def get_feature_names_out(self) -> list[Word]:
         """For compatibility with sklearn"""
