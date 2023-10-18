@@ -1,0 +1,8 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: speed_comparison
+        name: speed comparison
+        entry: python -m sklearn_validation
+        language: system
+        types: [python]
