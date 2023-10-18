@@ -58,6 +58,7 @@ class CountVectorizer:
                 )
             doc_term_matrix.append(doc_term_vec)
 
+        # creates a new link to object doc_term_matrix, which is changed in place
         padded_doc_term_matrix = self._pad_doc_term_matrix(doc_term_matrix, vocab_size)
 
         return padded_doc_term_matrix, word2idx
