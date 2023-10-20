@@ -116,14 +116,17 @@ def idf(count_matrix: DocTermMatrix) -> IDFVec:
     """Calculate inverse document frequency vector from doc-term matrix"""
     n_docs = len(count_matrix)
 
-    def vec_tf_idf(cnt_word_in_all_docs: Sequence[int], n_docs: int = n_docs) -> IDF:
-        def idf_formula(n_docs, n_docs_w_word) -> IDF:
-            return math.log((n_docs + 1) / (n_docs_w_word + 1)) + 1
+    def idf_formula(n_docs, n_docs_w_word) -> IDF:
+        return math.log((n_docs + 1) / (n_docs_w_word + 1)) + 1
 
+    def vec_tf_idf(
+        cnt_word_in_all_docs: Sequence[int],
+        n_docs: int = n_docs,
+    ) -> IDF:
         n_docs_w_word = sum(1 for x in cnt_word_in_all_docs if x > 0)
         return idf_formula(n_docs, n_docs_w_word)
 
-    idf_vec = [vec_tf_idf(doc_vec) for doc_vec in zip(*count_matrix)]
+    idf_vec = list(map(vec_tf_idf, zip(*count_matrix)))
     return idf_vec
 
 
